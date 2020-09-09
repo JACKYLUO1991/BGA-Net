@@ -1,0 +1,1 @@
+python train.py --gpu 0 --dataset Drishti-GS --batch-size 12 --coefficient 0.01

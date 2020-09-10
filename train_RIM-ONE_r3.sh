@@ -1,0 +1,1 @@
+python train.py --gpu 1 --dataset RIM-ONE_r3 --batch-size 12 --coefficient 0.01

@@ -25,7 +25,7 @@ def main():
     )
     parser.add_argument('-g', '--gpu', type=int, default=0)
     parser.add_argument(
-        '--resize', type=int, default=512, help='image resize')
+        '--resize', type=int, default=800, help='image resize')
 
     parser.add_argument(
         '--data-dir',
@@ -34,6 +34,7 @@ def main():
     )
     parser.add_argument(
         '--mask-dir',
+        required=True,
         default='./fundus/Drishti-GS/test/mask',
         help='mask image path'
     )

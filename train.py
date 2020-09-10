@@ -49,7 +49,7 @@ def main():
         '--warmup-epoch', type=int, default=-1, help='warmup epoch begin train GAN'
     )
     parser.add_argument(
-        '--interval-validate', type=int, default=5, help='interval epoch number to valide the model'
+        '--interval-validate', type=int, default=1, help='interval epoch number to valide the model'
     )
     parser.add_argument(
         '--lr-gen', type=float, default=1e-3, help='learning rate',
@@ -122,7 +122,7 @@ def main():
     ])
 
     composed_transforms_val = transforms.Compose([
-        tr.Scale(512),
+        tr.RandomCrop(512),
         tr.Normalize_tf(),
         tr.ToTensor()
     ])

@@ -97,11 +97,11 @@ class Trainer(object):
         self.iteration = 0
         self.max_epoch = max_epoch
         self.stop_epoch = stop_epoch if stop_epoch is not None else max_epoch
-        # self.best_disc_dice = 0.0
+        self.best_disc_dice = 0.0
         self.running_seg_loss = 0.0
         self.running_adv_loss = 0.0
         self.running_disc_loss = 0.0
-        # self.best_mean_dice = 0.0
+        # self.best_cup_dice = 0.0
         self.best_epoch = -1
         self.best_loss = np.inf
 
@@ -146,16 +146,15 @@ class Trainer(object):
             self.writer.add_scalar('val_data/val_CUP_dice', val_cup_dice, self.epoch * (len(self.validation_loader)))
             self.writer.add_scalar('val_data/val_DISC_dice', val_disc_dice, self.epoch * (len(self.validation_loader)))
 
-            # mean_dice = val_cup_dice + val_disc_dice
-            # is_best = mean_dice > self.best_mean_dice
-            # if is_best:
-            #     self.best_epoch = self.epoch + 1
-            #     self.best_mean_dice = mean_dice
-
-            is_best = val_loss < self.best_loss
+            mean_dice = (val_cup_dice * 2 + val_disc_dice) / 3  # cup weight higher than disc
+            is_best = mean_dice > self.best_disc_dice
             if is_best:
                 self.best_epoch = self.epoch + 1
-                self.best_loss = val_loss
+                self.best_disc_dice = mean_dice
+            # is_best = val_loss < self.best_loss
+            # if is_best:
+            #     self.best_epoch = self.epoch + 1
+            #     self.best_loss = val_loss
 
                 torch.save({
                     'epoch': self.epoch,

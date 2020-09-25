@@ -201,7 +201,7 @@ def save_csv_fovea_location_performance(output_filename, distance):
         my_writer.writerow([str(distance)])
 
 
-def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs):
+def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs, seg_cdrs):
     '''
     Save the table of segmentation results as a CSV file.
 
@@ -218,10 +218,10 @@ def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc
         # initialize the writer
         table_writer = csv.writer(csv_file)
         # write the column names
-        table_writer.writerow(['Filename', 'Cup-Dice', 'Disc-Dice', 'AE-CDR'])
+        table_writer.writerow(['Filename', 'Cup-Dice', 'Disc-Dice', 'AE-CDR', 'CDR'])
         # write each row
         for i in range(len(image_filenames)):
-            table_writer.writerow([image_filenames[i], str(cup_dices[i]), str(disc_dices[i]), str(ae_cdrs[i])])
+            table_writer.writerow([image_filenames[i], str(cup_dices[i]), str(disc_dices[i]), str(ae_cdrs[i]), str(seg_cdrs[i])])
 
 
 def save_csv_fovea_location_table(table_filename, image_filenames, distances):
@@ -245,7 +245,7 @@ def save_csv_fovea_location_table(table_filename, image_filenames, distances):
             table_writer.writerow([image_filenames[i], str(distances[i])])
 
 
-def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdrs):
+def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdrs, mean_cdrs):
     '''
     Save a CSV file with the mean performance
 
@@ -261,9 +261,9 @@ def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_
         # initialize the writer
         table_writer = csv.writer(csv_file)
         # write the column names
-        table_writer.writerow(['Cup-Dice', 'Disc-Dice', 'AE-CDR'])
+        table_writer.writerow(['Cup-Dice', 'Disc-Dice', 'AE-CDR', 'CDR'])
         # write each row
-        table_writer.writerow([str(mean_cup_dice), str(mean_disc_dice), str(mae_cdrs)])
+        table_writer.writerow([str(mean_cup_dice), str(mean_disc_dice), str(mae_cdrs), str(mean_cdrs)])
 
 
 def read_fovea_location_results(csv_filename):
@@ -272,7 +272,7 @@ def read_fovea_location_results(csv_filename):
     the (x,y) coordinates, respectively.
 
     Input:
-        csv_filename: full path and filename to a three columns CSV file with the fovea location results (image filename, x, y)
+        csv_filename: full path and filename to a three columns CSV file with the fovea localization results (image filename, x, y)
     Output:
         image_filenames: list of image filenames, as retrieved from the first column of the CSV file
         coordinates: a 2D numpy array of coordinates
@@ -311,7 +311,7 @@ def read_gt_fovea_location(xlsx_filename, is_training=False):
     the (x,y) coordinates, respectively.
 
     Input:
-        xlsx_filename: full path and filename to a three columns XLSX file with the fovea location results (image filename, x, y)
+        xlsx_filename: full path and filename to a three columns XLSX file with the fovea localization results (image filename, x, y)
         [is_training]: boolean indicating if we are using training data or no
     Output:
         image_filenames: list of image filenames, as retrieved from the first column of the CSV file
@@ -352,7 +352,7 @@ def read_gt_labels(xlsx_filename):
     the binary label for glaucoma (1) / healthy (0).
 
     Input:
-        xlsx_filename: full path and filename to a three columns XLSX file with the fovea location results (image filename, x, y)
+        xlsx_filename: full path and filename to a three columns XLSX file with the fovea localization results (image filename, x, y)
     Output:
         image_filenames: list of image filenames, as retrieved from the first column of the CSV file
         labels: a 2D numpy array of coordinates

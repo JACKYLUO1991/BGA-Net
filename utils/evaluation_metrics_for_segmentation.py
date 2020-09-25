@@ -118,8 +118,9 @@ def evaluate_binary_segmentation(segmentation, gt_label):
     disc_dice = dice_coefficient(segmentation < 255, gt_label < 255)
     # compute the absolute error between the cup to disc ratio estimated from the segmentation vs. the gt label
     cdr = absolute_error(vertical_cup_to_disc_ratio(segmentation), vertical_cup_to_disc_ratio(gt_label))
+    cdr_seg = vertical_cup_to_disc_ratio(segmentation)
 
-    return cup_dice, disc_dice, cdr
+    return cup_dice, disc_dice, cdr, cdr_seg
 
 
 def generate_table_of_results(image_filenames, segmentation_folder, gt_folder, is_training=False):
@@ -144,6 +145,7 @@ def generate_table_of_results(image_filenames, segmentation_folder, gt_folder, i
     disc_dices = np.zeros(len(image_filenames), dtype=np.float)
     # initialize an array for the absolute errors of the vertical cup to disc ratios
     ae_cdrs = np.zeros(len(image_filenames), dtype=np.float)
+    seg_cdrs = np.zeros(len(image_filenames), dtype=np.float)
 
     # iterate for each image filename
     for i in range(len(image_filenames)):
@@ -178,13 +180,13 @@ def generate_table_of_results(image_filenames, segmentation_folder, gt_folder, i
         # print("gt:", gt_label.shape)
 
         # evaluate the results and assign to the corresponding row in the table
-        cup_dices[i], disc_dices[i], ae_cdrs[i] = evaluate_binary_segmentation(segmentation, gt_label)
+        cup_dices[i], disc_dices[i], ae_cdrs[i], seg_cdrs[i] = evaluate_binary_segmentation(segmentation, gt_label)
 
     # return the colums of the table
-    return image_filenames, cup_dices, disc_dices, ae_cdrs
+    return image_filenames, cup_dices, disc_dices, ae_cdrs, seg_cdrs
 
 
-def get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs):
+def get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs, seg_cdrs):
     '''
     Compute the mean evaluation metrics for the segmentation task.
 
@@ -202,8 +204,9 @@ def get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs):
     mean_cup_dice = np.mean(cup_dices)
     mean_disc_dice = np.mean(disc_dices)
     mae_cdr = np.mean(ae_cdrs)
+    mean_cdr = np.mean(seg_cdrs)
 
-    return mean_cup_dice, mean_disc_dice, mae_cdr
+    return mean_cup_dice, mean_disc_dice, mae_cdr, mean_cdr
 
 
 def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=None, export_table=False,
@@ -234,17 +237,17 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
         makedirs(output_path)
 
     # generate a table of results
-    _, cup_dices, disc_dices, ae_cdrs = generate_table_of_results(image_filenames, segmentation_folder, gt_folder,
+    _, cup_dices, disc_dices, ae_cdrs, seg_cdrs = generate_table_of_results(image_filenames, segmentation_folder, gt_folder,
                                                                   is_training)
     # if we need to save the table
     if not (output_path is None) and (export_table):
         # initialize the table filename
-        table_filename = path.join(output_path, 'evaluation_table_segmentation.csv')
+        table_filename = path.join(output_path, 'Drishti-GS-results.csv')
         # save the table        
-        save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs)
+        save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs, seg_cdrs)
 
     # compute the mean values
-    mean_cup_dice, mean_disc_dice, mae_cdr = get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs)
+    mean_cup_dice, mean_disc_dice, mae_cdr, mean_cdr = get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs, seg_cdrs)
     # print the results on screen
     # print('Dice Optic Cup = {}\nDice Optic Disc = {}\nMAE CDR = {}'.format(str(mean_cup_dice), str(mean_disc_dice),
     #                                                                        str(mae_cdr)))
@@ -254,7 +257,7 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
         # initialize the output filename
         output_filename = path.join(output_path, 'evaluation_segmentation.csv')
         # save the results
-        save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdr)
+        # save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdr, mean_cdr)
 
     # return the average performance
-    return mean_cup_dice, mean_disc_dice, mae_cdr
+    return mean_cup_dice, mean_disc_dice, mae_cdr, mean_cdr

@@ -7,6 +7,8 @@ from networks.aspp import build_aspp
 from networks.decoder import build_decoder
 from networks.backbone import build_backbone
 
+from torchstat import stat
+
 
 class DeepLab(nn.Module):
 
@@ -35,8 +37,7 @@ class DeepLab(nn.Module):
 
         x2 = F.interpolate(x2, size=input.size()[2:], mode='bilinear', align_corners=True)
         x1 = F.interpolate(x1, size=input.size()[2:], mode='bilinear', align_corners=True)
-
-        # return x1, x2, feature
+        
         return x1, x2
 
     def freeze_bn(self):
@@ -65,3 +66,8 @@ class DeepLab(nn.Module):
                     for p in m[1].parameters():
                         if p.requires_grad:
                             yield p
+
+
+if __name__ == '__main__':
+    net = DeepLab(num_classes=2, backbone='mobilenet')
+    stat(net, (3, 800, 800))

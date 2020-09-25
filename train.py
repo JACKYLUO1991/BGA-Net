@@ -131,7 +131,7 @@ def main():
                                        transform=composed_transforms_train)
     dataloader_train = DataLoader(data_train, batch_size=args.batch_size, shuffle=True, num_workers=4,
                                   pin_memory=True)
-    data_val = DL.FundusSegmentation(base_dir=args.data_dir, dataset=args.dataset, split='test',
+    data_val = DL.FundusSegmentation(base_dir=args.data_dir, dataset=args.dataset, split='testval',
                                      transform=composed_transforms_val)
     dataloader_val = DataLoader(data_val, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
     # domain_val = DL.FundusSegmentation(base_dir=args.data_dir, dataset=args.datasetT, split='train',

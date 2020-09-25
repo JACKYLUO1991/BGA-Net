@@ -357,7 +357,7 @@ class Trainer(object):
                                                                    torch.FloatTensor(D_mask_T.data.size()).fill_(
                                                                        real_label).cuda())
 
-                loss_disc = loss_D_bd + loss_D_mask + loss_D_mask_T + loss_D_bd_T
+                loss_disc = self.coefficient * (loss_D_bd + loss_D_mask + loss_D_mask_T + loss_D_bd_T)
                 self.running_disc_loss += loss_disc.item()
                 loss_disc_data = loss_disc.data.item()
                 loss_disc.backward()

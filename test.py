@@ -1,4 +1,6 @@
 import argparse
+import time
+import numpy as np
 
 import torch
 # from torch.autograd import Variable
@@ -82,7 +84,10 @@ def main():
         tr.Normalize_tf(),
         tr.ToTensor()
     ])
-    db_test = DL.FundusSegmentation(base_dir=args.data_dir, dataset=args.dataset, split='test',
+    split_data = 'testval'
+    if args.dataset == 'refuge':
+        split_data = 'test'
+    db_test = DL.FundusSegmentation(base_dir=args.data_dir, dataset=args.dataset, split=split_data,
                                     transform=composed_transforms_test)
 
     test_loader = DataLoader(db_test, batch_size=1, shuffle=False, num_workers=4, pin_memory=True)
@@ -121,6 +126,7 @@ def main():
     timestamp_start = \
         datetime.now(pytz.timezone('Asia/Hong_Kong'))
 
+    durings = []
     with torch.no_grad():
         for batch_idx, (sample) in tqdm.tqdm(enumerate(test_loader),
                                              total=len(test_loader),
@@ -131,22 +137,31 @@ def main():
             if torch.cuda.is_available():
                 data, target = data.cuda(), target.cuda()
             # data, target = Variable(data), Variable(target)
+
+            torch.cuda.synchronize()
+            start = time.time()
             prediction, boundary = model(data)
             prediction = torch.nn.functional.interpolate(prediction, size=(target.size()[2], target.size()[3]),
                                                          mode="bilinear")
-            # boundary = torch.nn.functional.interpolate(boundary, size=(target.size()[2], target.size()[3]),
-            #                                            mode="bilinear")
+            boundary = torch.nn.functional.interpolate(boundary, size=(target.size()[2], target.size()[3]),
+                                                       mode="bilinear")
             data = torch.nn.functional.interpolate(data, size=(target.size()[2], target.size()[3]), mode="bilinear")
+            torch.cuda.synchronize()
+            end = time.time()
+            during = end - start
+            durings.append(during)
+
             cup_dice, disc_dice = dice_coeff_2label(prediction, target)
             test_cup_dice += cup_dice
             test_disc_dice += disc_dice
 
-            # boundary = torch.sigmoid(boundary)
-
-            # # drawing figures
-            # draw_ent(prediction.data.cpu()[0].numpy(), os.path.join(args.save_root_ent, args.dataset), img_name[0])
-            # draw_mask(prediction.data.cpu()[0].numpy(), os.path.join(args.save_root_mask, args.dataset), img_name[0])
-            # draw_boundary(boundary.data.cpu()[0].numpy(), os.path.join(args.save_root_mask, args.dataset), img_name[0])
+            # drawing figures
+            draw_ent(torch.sigmoid(prediction).data.cpu()[0].numpy(), os.path.join(args.save_root_ent, args.dataset),
+                     img_name[0])
+            draw_mask(torch.sigmoid(prediction).data.cpu()[0].numpy(), os.path.join(args.save_root_mask, args.dataset),
+                      img_name[0])
+            draw_boundary(torch.sigmoid(boundary).data.cpu()[0].numpy(),
+                          os.path.join(args.save_root_mask, args.dataset), img_name[0])
 
             prediction, ROI_mask = postprocessing(torch.sigmoid(prediction).data.cpu()[0], dataset=args.dataset)
             imgs = data.data.cpu()
@@ -163,9 +178,15 @@ def main():
         print("test_cup_dice = ", test_cup_dice)
         print("test_disc_dice = ", test_disc_dice)
 
+    durings = durings[:-1]
+    tim = np.sum(durings) / len(durings)
+    print("Time: ", tim)
+
+
     # submit script
-    _, _, mae_cdr = evaluate_segmentation_results(osp.join(args.test_prediction_save_path, args.dataset, 'pred_mask'),
-                                                  args.mask_dir, output_path="./", export_table=True)
+    _, _, mae_cdr, _ = evaluate_segmentation_results(
+        osp.join(args.test_prediction_save_path, args.dataset, 'pred_mask'),
+        args.mask_dir, output_path="./results", export_table=True)
 
     with open(osp.join(args.test_prediction_save_path, 'test_log.csv'), 'a') as f:
         elapsed_time = (

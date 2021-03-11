@@ -14,6 +14,10 @@ from dataloaders import custom_transforms as tr
 from networks.deeplabv3 import *
 from networks.GAN import BoundaryDiscriminator, MaskDiscriminator
 
+from torch.backends import cudnn
+cudnn.benchmark = False 
+cudnn.deterministic = True
+
 here = osp.dirname(osp.abspath(__file__))
 
 
@@ -107,6 +111,11 @@ def main():
     torch.manual_seed(2020)
     if cuda:
         torch.cuda.manual_seed(2020)
+    
+    import random
+    import numpy as np
+    random.seed(2020)
+    np.random.seed(2020)
 
     # 1. loading data
     composed_transforms_train = transforms.Compose([

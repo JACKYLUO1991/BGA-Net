@@ -13,5 +13,5 @@ Experimental results show that our BGA-Net system achieves stateof-the-art OC an
 ## Conclusion
 In this work, we not only achieve superior OD and OC segmentation results, but also confirm that the values calculated through the geometric relationship between the former two are highly related to glaucoma.
 
-##### *For training：sh train_Drishti-GS.sh
+##### For training：sh train_Drishti-GS.sh
 

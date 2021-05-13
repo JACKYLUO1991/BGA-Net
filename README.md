@@ -15,3 +15,13 @@ In this work, we not only achieve superior OD and OC segmentation results, but a
 
 ##### For training：sh train_Drishti-GS.sh
 
+```
+@article{luo2021joint,
+  title={Joint optic disc and optic cup segmentation based on boundary prior and adversarial learning},
+  author={Luo, Ling and Xue, Dingyu and Pan, Feng and Feng, Xinglong},
+  journal={International Journal of Computer Assisted Radiology and Surgery},
+  pages={1--10},
+  year={2021},
+  publisher={Springer}
+}
+```

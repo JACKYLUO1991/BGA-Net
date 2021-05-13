@@ -15,6 +15,7 @@ In this work, we not only achieve superior OD and OC segmentation results, but a
 
 ##### For training：sh train_Drishti-GS.sh
 
+#### Please cite:
 ```
 @article{luo2021joint,
   title={Joint optic disc and optic cup segmentation based on boundary prior and adversarial learning},

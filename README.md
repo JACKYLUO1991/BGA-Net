@@ -1,5 +1,4 @@
-# BGA-Net
-Joint optic disc and optic cup segmentation based on boundary prior and adversarial learning.
+# Joint optic disc and optic cup segmentation based on boundary prior and adversarial learning(BGA-Net)
 
 ## Purpose 
 The most direct means of glaucoma screening is to use cup-to-disc ratio (CDR) via color fundus photography, the first step of which is the precise segmentation of the optic cup (OC) and optic disc (OD). In recent years, convolution neural networks (CNN) have shown outstanding performance in medical segmentation tasks. However, most CNN-based methods ignore the effect of boundary ambiguity on performance, which leads to low generalization. This paper is dedicated to solving this issue.
